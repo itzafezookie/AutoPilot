@@ -1,14 +1,12 @@
-# AutoPilot - Your Personal Workout Tracker
+# AutoPilot - Your Workout Companion
 
-AutoPilot is a modern, progressive web application (PWA) designed to help you track your workouts, monitor your progress, and achieve your fitness goals. Built with React and Vite, it offers a fast, responsive, and reliable user experience.
+AutoPilot is a simple and straightforward Progressive Web App (PWA) designed to take the guesswork out of your gym routine. It's perfect for anyone who wants a no-thinking-necessary workout regimen, especially at Planet Fitness. Just show up, put on some music, and work out on AutoPilot.
 
 ## Key Features
 
-*   **Workout Logging**: Easily log your exercises, sets, reps, and weights.
-*   **Exercise Database**: A comprehensive list of exercises to choose from.
-*   **Progress Tracking**: Visualize your progress over time with charts and stats.
-*   **PWA Support**: Install AutoPilot on your device for a native-app-like experience, including offline access.
-*   **Modern Tech Stack**: Built with React and Vite for a fast and efficient development experience.
+*   **Four Pre-Set Workouts**: Choose from one of four curated workout plans tailored for efficiency and designed to be compatible with equipment at most Planet Fitness clubs.
+*   **Simple and Focused**: No complicated logging or setup. Just open the app, pick your workout, and go.
+*   **PWA Support**: Install AutoPilot on your device for an app-like experience and quick access at the gym.
 
 ## Getting Started
 
@@ -23,7 +21,7 @@ To get a local copy up and running, follow these simple steps.
 
 ### Installation
 
-1.  Clone the repo
+1.  Clone the repo (replace `your-username` with your GitHub username)
     ```sh
     git clone https://github.com/your-username/AutoPilot.git
     ```
@@ -38,4 +36,7 @@ To get a local copy up and running, follow these simple steps.
 
 ## Usage
 
-Once the application is running, you can start tracking your workouts. Navigate through the different sections of the app to log your exercises and view your progress. Since it's a PWA, you can also install it on your mobile device for easy access at the gym.
+Using AutoPilot is as easy as it gets:
+1. Open the app.
+2. Select one of the four workouts.
+3. Follow the list of exercises and use the machines.
