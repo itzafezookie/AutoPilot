@@ -10,6 +10,7 @@ import NumberInputModal from './components/NumberInputModal'; // Import the new 
 import WorkoutSelection from './components/WorkoutSelection';
 import History from './components/History'; // NEW IMPORT
 import HistoryDetail from './components/HistoryDetail'; // NEW IMPORT
+import Settings from './components/Settings'; // NEW IMPORT
 import { workouts as rawWorkouts } from './data';
 
 // Process raw workout data to include a 'completed' flag for each exercise
@@ -362,6 +363,42 @@ function App() {
     }
   };
 
+  const handleImportHistory = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedHistory = JSON.parse(e.target.result);
+        // Basic validation
+        if (!Array.isArray(importedHistory)) {
+          throw new Error('Invalid history file format.');
+        }
+
+        if (window.confirm('Are you sure you want to replace your current history with the imported data?')) {
+          setWorkoutHistory(importedHistory.map(entry => ({ ...entry, date: new Date(entry.date) })));
+          // Recalculate completion counters from the imported history
+          const newCounters = importedHistory.reduce((acc, entry) => {
+            entry.exercises.forEach(ex => {
+              if (ex.completionOrder && ex.completionOrder > (acc[ex.category] || 0)) {
+                acc[ex.category] = ex.completionOrder;
+              }
+            });
+            return acc;
+          }, { push: 0, pull: 0, legs: 0 });
+          setCompletionCounters(newCounters);
+
+          alert('History imported successfully.');
+          setCurrentView('selection');
+        }
+      } catch (error) {
+        alert(`Failed to import history: ${error.message}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const openNumberModal = (initialValue, onConfirm) => {
     setNumberModalConfig({ initialValue, onConfirm });
     setIsNumberModalOpen(true);
@@ -390,8 +427,33 @@ function App() {
     closePlateCalculatorModal();
   };
 
+  const handleExportHistory = () => {
+    const historyJson = JSON.stringify(workoutHistory, null, 2);
+    const blob = new Blob([historyJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `workout-history-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleResetHistory = () => {
+    if (window.confirm('Are you sure you want to reset all workout history? This action cannot be undone.')) {
+      setWorkoutHistory([]);
+      setCompletionCounters({ push: 0, pull: 0, legs: 0 });
+      // The useEffect hook will handle updating localStorage
+      alert('Workout history has been reset.');
+      setCurrentView('selection'); // Go back to the main screen
+    }
+  };
+
   const renderContent = () => {
     switch (currentView) {
+      case 'settings':
+        return <Settings onNavigate={setCurrentView} onExport={handleExportHistory} onReset={handleResetHistory} onImport={handleImportHistory} />;
       case 'historyDetail':
         return <HistoryDetail entry={selectedHistoryEntry} onNavigate={setCurrentView} />;
       case 'history':
@@ -427,7 +489,10 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <Header onNavigateHome={() => setCurrentView('selection')} />
+      <Header 
+        onNavigateHome={() => setCurrentView('selection')} 
+        onNavigateSettings={() => setCurrentView('settings')}
+      />
       <div className={styles.container}>
         {renderContent()}
       </div>

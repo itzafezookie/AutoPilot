@@ -16,18 +16,30 @@
 .logo {
     height: 60px; /* Adjust logo size */
     width: auto;
-}
-
-.homeButton {
-    background: none;
-    border: none;
     cursor: pointer;
-    padding: 0.5rem;
-    line-height: 1;
 }
 
-.homeIcon {
-    height: 45px; /* Adjust icon size */
-    width: auto;
-    pointer-events: none; /* Make icon click-through */
+.navButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.navButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navIcon {
+  height: 45px;
+  width: auto;
+  transition: transform 0.2s ease;
+}
+
+.navButton:hover .navIcon {
+  transform: scale(1.1);
 }

@@ -36,6 +36,11 @@ function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, open
     onSetUpdate(exercise.id, [...setsWithTimestamp, newSet]);
   };
 
+  const deleteSet = (indexToDelete) => {
+    const newSets = sets.filter((_, index) => index !== indexToDelete);
+    onSetUpdate(exercise.id, newSets);
+  };
+
   const handleSetChange = (index, field, value) => {
     const newSets = [...sets];
     // If the value is an object with plateCounts, it came from the PlateCalculator
@@ -97,6 +102,7 @@ function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, open
               <div className={styles.timestamp}>
                 {set.timestamp ? new Date(set.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
               </div>
+              <button onClick={() => deleteSet(index)} className={styles.deleteButton}>🗑️</button>
             </div>
           ))}
         </div>

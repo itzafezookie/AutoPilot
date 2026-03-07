@@ -23,12 +23,19 @@ function WorkoutSelection({ workouts, onStartWorkout, onNavigate, activeWorkout 
   return (
     <div className={styles.container}>
       {activeWorkout ? (
-        <div className={styles.continueContainer}>
-          <h2 className={styles.title}>Workout in Progress</h2>
-          <button onClick={() => onNavigate('workout')} className={styles.continueButton}>
-            Continue Workout
-          </button>
-        </div>
+        <>
+          <div className={styles.mainContent}>
+            <h2 className={styles.title}>Workout in Progress</h2>
+            <button onClick={() => onNavigate('workout')} className={styles.continueButton}>
+              Continue Workout
+            </button>
+          </div>
+          <div className={styles.historyButtonContainer}>
+            <button onClick={() => onNavigate('history')} className={styles.historyButton}>
+              View Workout History
+            </button>
+          </div>
+        </>
       ) : (
         <>
           <div className={styles.mainContent}>
