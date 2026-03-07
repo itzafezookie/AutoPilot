@@ -1,16 +1,41 @@
-# React + Vite
+# AutoPilot - Your Personal Workout Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AutoPilot is a modern, progressive web application (PWA) designed to help you track your workouts, monitor your progress, and achieve your fitness goals. Built with React and Vite, it offers a fast, responsive, and reliable user experience.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **Workout Logging**: Easily log your exercises, sets, reps, and weights.
+*   **Exercise Database**: A comprehensive list of exercises to choose from.
+*   **Progress Tracking**: Visualize your progress over time with charts and stats.
+*   **PWA Support**: Install AutoPilot on your device for a native-app-like experience, including offline access.
+*   **Modern Tech Stack**: Built with React and Vite for a fast and efficient development experience.
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To get a local copy up and running, follow these simple steps.
 
-## Expanding the ESLint configuration
+### Prerequisites
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+*   npm
+    ```sh
+    npm install npm@latest -g
+    ```
+
+### Installation
+
+1.  Clone the repo
+    ```sh
+    git clone https://github.com/your-username/AutoPilot.git
+    ```
+2.  Install NPM packages
+    ```sh
+    npm install
+    ```
+3.  Start the development server
+    ```sh
+    npm run dev
+    ```
+
+## Usage
+
+Once the application is running, you can start tracking your workouts. Navigate through the different sections of the app to log your exercises and view your progress. Since it's a PWA, you can also install it on your mobile device for easy access at the gym.
