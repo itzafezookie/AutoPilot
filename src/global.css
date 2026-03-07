@@ -1,0 +1,26 @@
+:root {
+  --primary-color: #84bd00; /* A vibrant green for primary actions */
+  --primary-color-translucent: rgba(132, 189, 0, 0.5); /* Translucent version for glows */
+  --secondary-color: #4A4A4A; /* A dark gray for secondary elements */
+  --background-color: #1F1F1F; /* A very dark gray for the main background */
+  --surface-color: #2C2C2C; /* A slightly lighter gray for cards and surfaces */
+  --text-color: #bcbcbc;
+  --text-color-secondary: #A0A0A0;
+  --error-color: #FF6B6B;
+
+  --font-family: 'Inter', sans-serif; /* A clean, modern sans-serif font */
+
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* You can also add a link to Google Fonts in your index.html for 'Inter' */

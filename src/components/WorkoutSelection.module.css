@@ -1,0 +1,208 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Fill the parent container from App.jsx */
+  width: 100%;
+  text-align: center;
+}
+
+.mainContent {
+  flex-grow: 1; /* Grow to fill available space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center content vertically */
+  width: 100%;
+}
+
+.startButton {
+  /* Using the global button styles from global.css */
+  margin-top: 1.5rem; /* Space between list and button */
+}
+
+.historyButtonContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.historyButton {
+  height: 50px;
+  width: 80%;
+  max-width: 350px;
+  border-radius: 50px;
+  background-color: var(--surface-color);
+  color: var(--text-color-secondary);
+  border: 1px solid var(--secondary-color);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.historyButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* --- Animation Styles --- */
+
+.revealContainer {
+  height: 240px; /* Fixed height to prevent jump */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Ensure z-index works */
+  z-index: 1;       /* Place preview container behind buttons */
+}
+
+.previewWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.previewWrapper.animatingOut {
+  animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+}
+
+.categoryButtons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  position: relative; /* Ensure z-index works */
+  z-index: 10;      /* Bring buttons to the front */
+}
+
+.categoryButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--secondary-color);
+  border-radius: 50px; /* Pill shape */
+  background-color: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.categoryButton.selected {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.categoryButton:not(.selected):hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.preview {
+  margin-bottom: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.previewTitle {
+  font-size: 1.2rem;
+  color: var(--text-color-secondary);
+  margin-top: 4rem; /* Adds space above the title */
+  margin-bottom: 1rem;
+}
+
+.previewList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.previewList li {
+  padding: 0.25rem 0;
+  color: var(--text-color-secondary);
+}
+
+.startButton, .historyButton, .continueButton {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 1rem;
+}
+
+.startButton {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: 1px solid var(--primary-color);
+}
+
+.startButton:disabled {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.historyButton, .continueButton {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--secondary-color);
+}
+
+.startButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(132, 189, 0, 0.3);
+}
+
+.historyButton:hover, .continueButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-3px);
+}
+
+.continueContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}

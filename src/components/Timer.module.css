@@ -1,0 +1,70 @@
+.timerContainer {
+  padding: 1rem;
+  margin-top: 1.5rem;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.timeDisplay {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.progressContainer {
+  width: 100%;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progressBar {
+  height: 8px;
+  background-color: var(--primary-color);
+  transition: width 0.5s linear;
+}
+
+.buttonContainer {
+  min-height: 50px; /* Reserve space for buttons */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.presetButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.presetButton,
+.controlButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.presetButton:hover,
+.controlButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.controlButton.stop {
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+
+.controlButton.stop:hover {
+  background-color: var(--error-color);
+  color: var(--background-color);
+}

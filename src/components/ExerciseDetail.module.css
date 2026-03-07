@@ -1,0 +1,117 @@
+.modalContent {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: var(--box-shadow);
+  position: relative; /* Needed for positioning the close button */
+}
+
+.closeModal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-color-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1; /* Ensure consistent vertical alignment */
+  transition: color 0.2s ease;
+}
+
+.closeModal:hover {
+  color: var(--primary-color);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.setsContainer {
+  margin-bottom: 1.5rem;
+}
+
+.setRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--background-color);
+  border-radius: 8px;
+}
+
+.setNumber {
+  font-weight: 600;
+  color: var(--primary-color);
+  min-width: 40px; /* Give it a fixed width */
+}
+
+.inputField {
+  background-color: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color);
+  padding: 0.75rem;
+  border-radius: 8px;
+  width: 60px; /* Slightly smaller input fields */
+  text-align: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.inputField:hover {
+  border-color: var(--primary-color);
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  margin-left: auto;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem; /* Add space before timer */
+}
+
+.actionButton,
+.completeButton {
+  flex-grow: 1;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.actionButton {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border-color: var(--secondary-color);
+}
+
+.completeButton {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border-color: var(--primary-color);
+}
+
+.actionButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.completeButton:hover {
+  transform: scale(1.03);
+  background-color: #95d300; /* Brighter green */
+}

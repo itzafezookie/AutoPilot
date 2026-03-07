@@ -1,0 +1,38 @@
+export const workouts = {
+  push: [
+    { id: 1, name: 'Hammer Chest Press' },
+    { id: 2, name: 'Hammer Incline Press' },
+    { id: 3, name: 'Hammer Shoulder Press' },
+    { id: 4, name: 'Lateral Raise (Deltoid)' },
+    { id: 5, name: 'Pec Fly' },
+    { id: 6, name: 'Assisted Dips' },
+    { id: 7, name: 'Cable Tricep Pushdowns' },
+  ],
+  pull: [
+    { id: 8, name: 'Hammer Front Pulldown' },
+    { id: 9, name: 'Hammer Row' },
+    { id: 10, name: 'Rear Delt (Pec-Fly)' },
+    { id: 11, name: 'Back Extension' },
+    { id: 12, name: 'Cable Bicep Curls' },
+    { id: 13, name: 'Assisted Pull Ups' },
+    { id: 14, name: 'Cable Face Pulls' },
+  ],
+  legs: [
+    { id: 15, name: 'Leg Press' },
+    { id: 16, name: 'Leg Extension' },
+    { id: 17, name: 'Leg Curl' },
+    { id: 18, name: 'Calf Extension' },
+    { id: 19, name: 'Hip Abduction' },
+    { id: 20, name: 'Hip Adduction' },
+    { id: 21, name: 'Glute Bridges' },
+  ],
+  'full body': [
+    { id: 22, name: 'Hammer Chest Press' },
+    { id: 23, name: 'Hammer Row' },
+    { id: 24, name: 'Hammer Shoulder Press' },
+    { id: 25, name: 'Leg Press' },
+    { id: 26, name: 'Back Extension' },
+    { id: 27, name: 'Assisted Pull-Ups' },
+    { id: 28, name: 'Tricep Pushdowns' },
+  ],
+};

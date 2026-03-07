@@ -1,0 +1,20 @@
+.container {
+  padding: 80px 1rem 100px 1rem; /* Added padding-bottom for fixed footer nav */
+  max-width: 900px; /* Widen the content area */
+  margin: 0 auto;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Re-center vertically */
+  z-index: 1000;
+  overflow-y: auto; /* Keep scrolling for long content */
+  padding: 2rem 1rem; /* Add some padding */
+}

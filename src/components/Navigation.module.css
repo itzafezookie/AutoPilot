@@ -1,0 +1,59 @@
+.nav {
+  position: fixed;
+  bottom: 1.5rem; /* 24px */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background-color: var(--surface-color);
+  padding: 0.5rem; /* 8px */
+  border-radius: 50px; /* Make it a pill shape */
+  box-shadow: var(--box-shadow);
+  z-index: 100;
+}
+
+.navButton {
+  padding: 0.75rem 1.5rem; /* 12px 24px */
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background-color: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  position: relative; /* For z-index to work */
+  z-index: 2;
+}
+
+.navButton.active {
+  color: var(--background-color);
+}
+
+.navButton:not(.active):hover {
+  color: var(--text-color);
+}
+
+.slider {
+  position: absolute;
+  top: 0.5rem; /* Match nav padding */
+  bottom: 0.5rem; /* Match nav padding */
+  background-color: var(--primary-color);
+  border-radius: 50px; /* Match nav border-radius */
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* Smooth, bouncy transition */
+  z-index: 1;
+}
+
+.completeButton {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.8rem; /* Larger checkmark */
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 1rem; /* Add some spacing */
+  z-index: 2; /* Ensure it's on top of the slider */
+  transition: transform 0.2s ease;
+}
+
+.completeButton:hover {
+  transform: scale(1.15);
+}

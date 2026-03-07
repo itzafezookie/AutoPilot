@@ -1,0 +1,53 @@
+.exercise {
+  background-color: var(--surface-color);
+  padding: 1rem 1.5rem; /* Reduced vertical padding */
+  border-radius: var(--border-radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  border-left: 5px solid transparent;
+}
+
+.exercise:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--primary-color);
+}
+
+.exercise.inProgress {
+  border-left-color: var(--primary-color);
+}
+
+.exercise.completed {
+  border-left-color: var(--secondary-color);
+  opacity: 0.6;
+}
+
+.exercise.completed .exerciseName {
+  text-decoration: line-through;
+}
+
+.exerciseName {
+  font-size: 1.1rem; /* Slightly smaller font */
+  font-weight: 500;
+  margin: 0;
+}
+
+.statusIcon {
+  font-size: 1.5rem;
+}
+
+/* Style for the next exercise in the queue */
+.next {
+  animation: breathing-glow 2s infinite ease-in-out;
+}
+
+@keyframes breathing-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px 0px var(--primary-color-translucent);
+  }
+  50% {
+    box-shadow: 0 0 15px 5px var(--primary-color-translucent);
+  }
+}
