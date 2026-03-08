@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css'
 import styles from './App.module.css';
 import Header from './components/Header'
@@ -7,6 +7,8 @@ import WorkoutTabs from './components/WorkoutTabs'
 import ExerciseDetail from './components/ExerciseDetail';
 import PlateCalculatorModal from './components/PlateCalculatorModal';
 import NumberInputModal from './components/NumberInputModal'; // Import the new modal
+import Timer from './components/Timer';
+
 import WorkoutSelection from './components/WorkoutSelection';
 import History from './components/History'; // NEW IMPORT
 import HistoryDetail from './components/HistoryDetail'; // NEW IMPORT
@@ -64,6 +66,8 @@ function App() {
   const [numberModalConfig, setNumberModalConfig] = useState({ initialValue: 0, onConfirm: () => {} });
   const [isPlateCalculatorOpen, setIsPlateCalculatorOpen] = useState(false);
   const [plateCalculatorConfig, setPlateCalculatorConfig] = useState({ initialValue: 0, onConfirm: () => {} });
+  const [isDebugMode, setIsDebugMode] = useState(false);
+  const beepRef = useRef(null);
 
 
 
@@ -453,7 +457,14 @@ function App() {
   const renderContent = () => {
     switch (currentView) {
       case 'settings':
-        return <Settings onNavigate={setCurrentView} onExport={handleExportHistory} onReset={handleResetHistory} onImport={handleImportHistory} />;
+        return <Settings 
+          onNavigate={setCurrentView} 
+          onExport={handleExportHistory} 
+          onReset={handleResetHistory} 
+          onImport={handleImportHistory}
+          isDebugMode={isDebugMode}
+          onToggleDebugMode={() => setIsDebugMode(!isDebugMode)}
+        />;
       case 'historyDetail':
         return <HistoryDetail entry={selectedHistoryEntry} onNavigate={setCurrentView} />;
       case 'history':
@@ -464,8 +475,10 @@ function App() {
             <Navigation 
               workouts={workouts}
               activeWorkout={activeWorkout}
+            beepRef={beepRef}
               onWorkoutChange={setActiveWorkout}
               onCompleteWorkout={handleCompleteWorkout}
+              isDebugMode={isDebugMode}
             />
             <WorkoutTabs 
               exercises={workouts[activeWorkout] || []} 
@@ -481,7 +494,8 @@ function App() {
             workouts={rawWorkouts} 
             onStartWorkout={handleStartWorkout} 
             onNavigate={setCurrentView}
-            activeWorkout={activeWorkout}
+          activeWorkout={activeWorkout}
+          isDebugMode={isDebugMode}
           />
         );
     }
@@ -497,6 +511,10 @@ function App() {
         {renderContent()}
       </div>
 
+      <audio ref={beepRef} preload="auto">
+        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
+      </audio>
+
       {selectedExercise && (
         <div className={styles.modalOverlay}>
           <ExerciseDetail
@@ -506,6 +524,8 @@ function App() {
             onToggleComplete={handleToggleComplete}
             openNumberModal={openNumberModal}
             openPlateCalculatorModal={openPlateCalculatorModal}
+            beepRef={beepRef}
+            isDebugMode={isDebugMode}
           />
         </div>
       )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './WorkoutSelection.module.css';
+import Timer from './Timer';
 
 function WorkoutSelection({ workouts, onStartWorkout, onNavigate, activeWorkout }) {
   const [selectedWorkout, setSelectedWorkout] = useState(null);
@@ -25,7 +26,7 @@ function WorkoutSelection({ workouts, onStartWorkout, onNavigate, activeWorkout 
       {activeWorkout ? (
         <>
           <div className={styles.mainContent}>
-            <h2 className={styles.title}>Workout in Progress</h2>
+            <h2 className={styles.title}>{activeWorkout.name}</h2>
             <button onClick={() => onNavigate('workout')} className={styles.continueButton}>
               Continue Workout
             </button>

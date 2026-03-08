@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styles from './ExerciseDetail.module.css';
-import Timer from './Timer'; // Import the Timer component
+import Timer from './Timer';
 
-function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, openNumberModal, openPlateCalculatorModal }) {
+function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, openNumberModal, openPlateCalculatorModal, beepRef, isDebugMode }) {
   const { sets, lastReps, lastWeight } = exercise;
 
   const addSet = () => {
@@ -112,7 +112,7 @@ function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, open
           <button onClick={handleComplete} className={styles.completeButton}>Complete Exercise</button>
         </div>
 
-        <Timer />
+        <Timer beepRef={beepRef} isDebugMode={isDebugMode} />
 
       </div>
   );
