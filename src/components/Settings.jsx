@@ -1,9 +1,8 @@
 import styles from './Settings.module.css';
 import fezukLogo from '../assets/Fezuk Tech Logo.svg';
 
-function Settings({ onExport, onImport, onReset, isDebugMode, onToggleDebugMode }) {
+function Settings({ onNavigate, onExport, onImport, onReset, isDebugMode, onToggleDebugMode }) {
   const handleImportClick = () => {
-    // This will trigger the hidden file input
     document.getElementById('import-file-input').click();
   };
 
@@ -12,6 +11,10 @@ function Settings({ onExport, onImport, onReset, isDebugMode, onToggleDebugMode 
       <div className={styles.mainContent}>
         <h2 className={styles.title}>Settings</h2>
         <div className={styles.buttonGroup}>
+          <button onClick={() => onNavigate('manageExercises')} className={styles.settingsButton}>
+            Manage Exercises
+          </button>
+          
           <button onClick={handleImportClick} className={styles.settingsButton}>
             Import History
           </button>

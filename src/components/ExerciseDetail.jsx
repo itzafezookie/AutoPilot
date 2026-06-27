@@ -1,8 +1,23 @@
-import { useState, useEffect } from 'react';
 import styles from './ExerciseDetail.module.css';
 import Timer from './Timer';
 
-function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, openNumberModal, openPlateCalculatorModal, beepRef, isDebugMode }) {
+function ExerciseDetail({ 
+  exercise, 
+  onClose, 
+  onSetUpdate, 
+  onToggleComplete, 
+  openNumberModal, 
+  openPlateCalculatorModal, 
+  isDebugMode,
+  // Hoisted timer props
+  countdown,
+  isTimerActive,
+  initialDuration,
+  startTimer,
+  stopTimer,
+  // Gym chaos A prop
+  onMachineUnavailable
+}) {
   const { sets, lastReps, lastWeight } = exercise;
 
   const addSet = () => {
@@ -72,49 +87,63 @@ function ExerciseDetail({ exercise, onClose, onSetUpdate, onToggleComplete, open
 
   return (
     <div className={styles.modalContent}>
-        <span className={styles.closeModal} onClick={onClose}>&times;</span>
-        <h2 className={styles.title}>{exercise.name}</h2>
-        
-        <div className={styles.setsContainer}>
-          {sets.map((set, index) => (
-            <div key={set.id} className={styles.setRow}>
-              <h3>Set {index + 1}</h3>
-              <div 
-                className={styles.inputField}
-                onClick={() => openNumberModal(set.reps, (newValue) => handleSetChange(index, 'reps', newValue))}
-              >
-                {set.reps || 'Reps'}
-              </div>
-              <div 
-                className={styles.inputField}
-                onClick={() => {
-                  if (exercise.name === 'Leg Press') {
-                    // For leg press, the initial value for the calculator is the detailed object from the last session
-                    const initialCalcValue = set.plateDetails || exercise.lastPlateDetails || set.weight;
-                    openPlateCalculatorModal(initialCalcValue, (newValue) => handleSetChange(index, 'weight', newValue));
-                  } else {
-                    openNumberModal(set.weight, (newValue) => handleSetChange(index, 'weight', newValue));
-                  }
-                }}
-              >
-                {set.weight || 'Lbs'}
-              </div>
-              <div className={styles.timestamp}>
-                {set.timestamp ? new Date(set.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-              </div>
-              <button onClick={() => deleteSet(index)} className={styles.deleteButton}>🗑️</button>
+      <span className={styles.closeModal} onClick={onClose}>&times;</span>
+      <h2 className={styles.title}>{exercise.name}</h2>
+      
+      <div className={styles.setsContainer}>
+        {sets.map((set, index) => (
+          <div key={set.id} className={styles.setRow}>
+            <h3>Set {index + 1}</h3>
+            <div 
+              className={styles.inputField}
+              onClick={() => openNumberModal(set.reps, (newValue) => handleSetChange(index, 'reps', newValue))}
+            >
+              {set.reps || 'Reps'}
             </div>
-          ))}
-        </div>
-
-        <div className={styles.buttonGroup}>
-          <button onClick={addSet} className={styles.actionButton}>New Set</button>
-          <button onClick={handleComplete} className={styles.completeButton}>Complete Exercise</button>
-        </div>
-
-        <Timer beepRef={beepRef} isDebugMode={isDebugMode} />
-
+            <div 
+              className={styles.inputField}
+              onClick={() => {
+                if (exercise.weightType === 'plate') {
+                  const initialCalcValue = set.plateDetails || exercise.lastPlateDetails || set.weight;
+                  openPlateCalculatorModal(initialCalcValue, (newValue) => handleSetChange(index, 'weight', newValue));
+                } else {
+                  openNumberModal(set.weight, (newValue) => handleSetChange(index, 'weight', newValue));
+                }
+              }}
+            >
+              {set.weight || 'Lbs'}
+            </div>
+            <div className={styles.timestamp}>
+              {set.timestamp ? new Date(set.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+            </div>
+            <button onClick={() => deleteSet(index)} className={styles.deleteButton}>&times;</button>
+          </div>
+        ))}
       </div>
+
+      <div className={styles.buttonGroup}>
+        <button onClick={addSet} className={styles.actionButton}>New Set</button>
+        <button onClick={handleComplete} className={styles.completeButton}>Complete Exercise</button>
+        <button 
+          onClick={() => {
+            onMachineUnavailable(exercise.id);
+            onClose();
+          }} 
+          className={styles.unavailableButton}
+        >
+          Machine Unavailable
+        </button>
+      </div>
+
+      <Timer 
+        countdown={countdown}
+        isTimerActive={isTimerActive}
+        initialDuration={initialDuration}
+        startTimer={startTimer}
+        stopTimer={stopTimer}
+        isDebugMode={isDebugMode}
+      />
+    </div>
   );
 }
 

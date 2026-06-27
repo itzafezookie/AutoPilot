@@ -43,3 +43,58 @@
 .navButton:hover .navIcon {
   transform: scale(1.1);
 }
+
+.timerPill {
+  position: relative;
+  width: 120px;
+  height: 32px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: var(--background-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+  /* Hardware acceleration to fix subpixel clipping artifacts */
+  transform: translate3d(0, 0, 0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.timerPillProgress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: var(--primary-color);
+  transition: width 1s linear;
+  z-index: 1;
+  /* Hardware acceleration for child layers */
+  transform: translate3d(0, 0, 0);
+}
+
+.timerPillText {
+  position: relative;
+  z-index: 2;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease-in-out;
+}
+
+.timerPill:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+  box-shadow: 0 0 0 1.5px var(--error-color), 0 2px 6px rgba(255, 107, 107, 0.2);
+}
+
+.timerPill:hover .timerPillProgress {
+  background-color: rgba(255, 107, 107, 0.25);
+}
+
+.timerPill:hover .timerPillText {
+  color: var(--error-color);
+}
+
+

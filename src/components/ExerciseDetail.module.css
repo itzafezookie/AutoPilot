@@ -134,3 +134,24 @@
   transform: scale(1.03);
   background-color: #95d300; /* Brighter green */
 }
+
+.unavailableButton {
+  flex-grow: 1;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background-color: rgba(255, 107, 107, 0.1);
+  color: var(--error-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.unavailableButton:hover {
+  background-color: var(--error-color);
+  color: var(--background-color);
+  border-color: var(--error-color);
+  transform: scale(1.03);
+}
+

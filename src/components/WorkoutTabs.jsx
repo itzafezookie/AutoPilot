@@ -1,7 +1,7 @@
 import styles from './WorkoutTabs.module.css';
 import Exercise from './Exercise';
 
-function WorkoutTabs({ exercises, onExerciseClick, onCompleteWorkout }) {
+function WorkoutTabs({ exercises, onExerciseClick, onAddExerciseClick }) {
   // Sort exercises by status: inProgress -> pending -> completed
   const sortedExercises = [...exercises].sort((a, b) => {
     const statusOrder = { inProgress: 0, pending: 1, completed: 2 };
@@ -13,10 +13,8 @@ function WorkoutTabs({ exercises, onExerciseClick, onCompleteWorkout }) {
   const lastInProgressIndex = sortedExercises.findLastIndex(ex => ex.status === 'inProgress');
 
   if (lastInProgressIndex !== -1) {
-    // The next exercise is the one right after the last in-progress one
     nextExerciseIndex = lastInProgressIndex + 1;
   } else {
-    // If nothing is in progress, the first pending exercise is the next one
     nextExerciseIndex = sortedExercises.findIndex(ex => ex.status === 'pending');
   }
 
@@ -27,9 +25,13 @@ function WorkoutTabs({ exercises, onExerciseClick, onCompleteWorkout }) {
           key={exercise.id} 
           exercise={exercise} 
           onClick={() => onExerciseClick(exercise)} 
-          isNext={index === nextExerciseIndex} // Pass the isNext flag
+          isNext={index === nextExerciseIndex}
         />
       ))}
+      
+      <div className={styles.addLiftCard} onClick={onAddExerciseClick}>
+        <span className={styles.addIcon}>+</span> Add Extra Lift
+      </div>
     </div>
   );
 }

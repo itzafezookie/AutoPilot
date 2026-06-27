@@ -1,0 +1,470 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-color);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* Header & Navigation */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.backButton {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 50px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: rgba(132, 189, 0, 0.05);
+}
+
+.addButton {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: 1px solid var(--primary-color);
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.addButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(132, 189, 0, 0.35);
+}
+
+/* List Content */
+.scrollList {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-right: 0.25rem;
+}
+
+.categorySection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.categoryTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  border-bottom: 1px solid var(--secondary-color);
+  padding-bottom: 0.4rem;
+}
+
+.exerciseGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.exerciseCard {
+  background-color: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s ease;
+}
+
+.exerciseCard:hover {
+  border-color: rgba(132, 189, 0, 0.3);
+}
+
+.cardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.exerciseName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.muscleLabel {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+.cardRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.weightTypeTag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background-color: var(--background-color);
+  color: var(--text-color-secondary);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid var(--secondary-color);
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.deleteButton:hover {
+  color: var(--error-color);
+  transform: scale(1.2);
+}
+
+/* Form Styles */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--box-shadow);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  background-color: var(--background-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-translucent);
+}
+
+.select {
+  background-color: var(--background-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select option {
+  background-color: var(--surface-color);
+  color: #ffffff;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Segmented Control */
+.segmentedControl {
+  display: flex;
+  background-color: var(--background-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+
+.segmentButton {
+  flex-grow: 1;
+  background-color: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.segmentButton.active {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.segmentButton:not(.active):hover {
+  color: var(--text-color);
+}
+
+/* Form Actions */
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.cancelButton,
+.saveButton {
+  flex-grow: 1;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.cancelButton {
+  background-color: transparent;
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color);
+}
+
+.cancelButton:hover {
+  border-color: var(--error-color);
+  color: var(--error-color);
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+.saveButton {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: 1px solid var(--primary-color);
+}
+
+.saveButton:disabled {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-color-secondary);
+  cursor: not-allowed;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: #95d300;
+  transform: translateY(-1px);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.customBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: rgba(0, 150, 255, 0.1);
+  color: #38b6ff;
+  border: 1px solid rgba(0, 150, 255, 0.2);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.hibernatedBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-color-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.hibernatedCard {
+  opacity: 0.5;
+  border-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.hibernatedCard:hover {
+  opacity: 0.75;
+  border-color: var(--secondary-color);
+}
+
+.editButton,
+.hibernateButton,
+.unhibernateButton {
+  background-color: transparent;
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.editButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: rgba(132, 189, 0, 0.05);
+}
+
+.hibernateButton:hover {
+  border-color: #ffb703;
+  color: #ffb703;
+  background-color: rgba(255, 183, 3, 0.05);
+}
+
+.unhibernateButton {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.unhibernateButton:hover {
+  background-color: rgba(132, 189, 0, 0.08);
+}
+
+.controlsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchInput {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-translucent);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.selectsRow {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.filterSelect,
+.sortSelect {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterSelect option,
+.sortSelect option {
+  background-color: var(--surface-color);
+  color: #ffffff;
+}
+
+.filterSelect:focus,
+.sortSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.noExercises {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  font-style: italic;
+  padding: 0.5rem 0;
+  text-align: left;
+  display: block;
+}
+
+

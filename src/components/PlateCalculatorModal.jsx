@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './PlateCalculatorModal.module.css';
 
 const PLATE_WEIGHTS = [45, 25, 10];

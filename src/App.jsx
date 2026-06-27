@@ -1,44 +1,55 @@
 import { useState, useEffect, useRef } from 'react';
-import './App.css'
+import './App.css';
 import styles from './App.module.css';
-import Header from './components/Header'
-import Navigation from './components/Navigation'
-import WorkoutTabs from './components/WorkoutTabs'
+import Header from './components/Header';
+import Navigation from './components/Navigation';
+import WorkoutTabs from './components/WorkoutTabs';
 import ExerciseDetail from './components/ExerciseDetail';
 import PlateCalculatorModal from './components/PlateCalculatorModal';
-import NumberInputModal from './components/NumberInputModal'; // Import the new modal
-import Timer from './components/Timer';
-
+import NumberInputModal from './components/NumberInputModal';
+import AddExerciseModal from './components/AddExerciseModal';
 import WorkoutSelection from './components/WorkoutSelection';
-import History from './components/History'; // NEW IMPORT
-import HistoryDetail from './components/HistoryDetail'; // NEW IMPORT
-import Settings from './components/Settings'; // NEW IMPORT
-import { workouts as rawWorkouts } from './data';
-
-// Process raw workout data to include a 'completed' flag for each exercise
-const initialWorkoutsState = Object.keys(rawWorkouts).reduce((acc, workoutType) => {
-  acc[workoutType] = rawWorkouts[workoutType].map(exercise => ({ ...exercise, status: 'pending', sets: [] }));
-  return acc;
-}, {});
+import History from './components/History';
+import HistoryDetail from './components/HistoryDetail';
+import Settings from './components/Settings';
+import ManageExercises from './components/ManageExercises';
+import { masterExercises, normalizeExerciseId, migrateExercisesList, migrateWorkoutHistory } from './data';
+import { useWakeLock } from './hooks/useWakeLock';
 
 function App() {
-  const [currentView, setCurrentView] = useState('selection'); // 'selection', 'workout', 'history', or 'historyDetail'
+  const [currentView, setCurrentView] = useState('selection'); // 'selection', 'workout', 'history', 'historyDetail', 'settings', 'manageExercises'
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [workouts, setWorkouts] = useState(initialWorkoutsState);
-  const [activeWorkout, setActiveWorkout] = useState(null); // No active workout initially
-  const [selectedHistoryEntry, setSelectedHistoryEntry] = useState(null); // For history detail view
+  
+  // Dynamic Library State
+  const [exercisesList, setExercisesList] = useState(() => {
+    try {
+      const savedExercises = localStorage.getItem('customExercises');
+      if (savedExercises) {
+        return migrateExercisesList(JSON.parse(savedExercises));
+      }
+    } catch (error) {
+      console.error("Failed to load custom exercises from localStorage", error);
+    }
+    return masterExercises;
+  });
 
-  // Initialize state directly from localStorage
+  // Dynamic Playlist and Scheduling states
+  const [activeWorkoutType, setActiveWorkoutType] = useState(null); // 'upper', 'legs', or null
+  const [activePlaylist, setActivePlaylist] = useState([]); // Array of exercises in active session
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
+
+  // Initialize history directly from localStorage
   const [workoutHistory, setWorkoutHistory] = useState(() => {
     try {
       const savedHistory = localStorage.getItem('workoutHistory');
       if (savedHistory) {
-        return JSON.parse(savedHistory).map(entry => ({ ...entry, date: new Date(entry.date) }));
+        const parsed = JSON.parse(savedHistory).map(entry => ({ ...entry, date: new Date(entry.date) }));
+        return migrateWorkoutHistory(parsed);
       }
     } catch (error) {
       console.error("Failed to load history from localStorage", error);
     }
-    return []; // Fallback to empty array
+    return [];
   });
 
   const [completionCounters, setCompletionCounters] = useState(() => {
@@ -48,20 +59,27 @@ function App() {
     } catch (error) {
       console.error("Failed to load counters from localStorage", error);
     }
-    return { push: 0, pull: 0, legs: 0 }; // Fallback
+    return { push: 0, pull: 0, legs: 0 };
   });
 
-  // Save workout history to localStorage whenever it changes
+  // Save history and exercises to localStorage
   useEffect(() => {
     try {
       localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory));
       localStorage.setItem('completionCounters', JSON.stringify(completionCounters));
+      localStorage.setItem('customExercises', JSON.stringify(exercisesList));
     } catch (error) {
-      console.error("Failed to save workout history to localStorage", error);
+      console.error("Failed to save state to localStorage", error);
     }
-  }, [workoutHistory, completionCounters]);
+  }, [workoutHistory, completionCounters, exercisesList]);
 
-  // State for the number input modal
+  // Hoisted Rest Timer States
+  const [countdown, setCountdown] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [initialDuration, setInitialDuration] = useState(0);
+  const { requestWakeLock, releaseWakeLock } = useWakeLock();
+
+  // Dialog / Input States
   const [isNumberModalOpen, setIsNumberModalOpen] = useState(false);
   const [numberModalConfig, setNumberModalConfig] = useState({ initialValue: 0, onConfirm: () => {} });
   const [isPlateCalculatorOpen, setIsPlateCalculatorOpen] = useState(false);
@@ -69,127 +87,183 @@ function App() {
   const [isDebugMode, setIsDebugMode] = useState(false);
   const beepRef = useRef(null);
 
-
-
-
-
-  const handleViewHistoryDetail = (entry) => {
-    setSelectedHistoryEntry(entry);
-    setCurrentView('historyDetail');
+  // Timer Sound Utility
+  const playMultipleBeeps = (times) => {
+    if (!beepRef.current) return;
+    let playCount = 0;
+    const playInterval = setInterval(() => {
+      if (playCount < times) {
+        beepRef.current.currentTime = 0;
+        beepRef.current.play();
+        playCount++;
+      } else {
+        clearInterval(playInterval);
+      }
+    }, 300);
   };
 
-  const reorderCategoryWorkout = (workoutName, history) => {
-    // 1. Create a map of exerciseId -> max completionOrder from all history
-    const orderMap = history
-      .flatMap(entry => entry.exercises)
-      .reduce((map, ex) => {
-        if (ex.completionOrder) {
-          // If an exercise appears multiple times, keep the highest (most recent) order number
-          map[ex.id] = Math.max(map[ex.id] || 0, ex.completionOrder);
-        }
-        return map;
-      }, {});
-
-    const defaultOrder = initialWorkoutsState[workoutName];
-
-    // If no exercises have been completed for this category, return the default order
-    if (Object.keys(orderMap).length === 0) {
-      return defaultOrder;
+  // Timer Effect
+  useEffect(() => {
+    let interval = null;
+    if (isTimerActive && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown(c => c - 1);
+      }, 1000);
+    } else if (isTimerActive && countdown === 0) {
+      setIsTimerActive(false);
+      playMultipleBeeps(5);
+      releaseWakeLock();
     }
+    return () => clearInterval(interval);
+  }, [isTimerActive, countdown, releaseWakeLock]);
 
-    // 2. Sort the default list. Higher order number means more recent, so it comes first.
-    const reorderedExercises = [...defaultOrder].sort((a, b) => {
-      const aOrder = orderMap[a.id] ?? -1; // Default to -1 if not found in history
-      const bOrder = orderMap[b.id] ?? -1;
-      return bOrder - aOrder; // Descending sort
+  const startTimer = (duration) => {
+    const time = isDebugMode ? 2 : duration;
+    setCountdown(time);
+    setInitialDuration(time);
+    setIsTimerActive(true);
+    requestWakeLock();
+  };
+
+  const stopTimer = () => {
+    setIsTimerActive(false);
+    setCountdown(0);
+    setInitialDuration(0);
+    releaseWakeLock();
+  };
+
+  // Exercise library manipulation
+  const handleCreateExercise = (newEx) => {
+    const nextId = exercisesList.length > 0 ? Math.max(...exercisesList.map(e => e.id)) + 1 : 1;
+    const createdEx = {
+      ...newEx,
+      id: nextId,
+      secondary: [],
+      custom: true
+    };
+    setExercisesList(prev => [...prev, createdEx]);
+  };
+
+  const handleDeleteExercise = (id) => {
+    setExercisesList(prev => prev.filter(ex => ex.id !== id));
+  };
+
+  const handleUpdateExercise = (updatedEx) => {
+    setExercisesList(prev => prev.map(ex => ex.id === updatedEx.id ? updatedEx : ex));
+  };
+
+  // Historical Ledger Calculation
+  const getExerciseSequenceMap = (history) => {
+    const map = {};
+    exercisesList.forEach(ex => {
+      map[ex.id] = 0;
     });
 
-    return reorderedExercises;
+    const sortedHistory = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+    let sequenceNumber = 1;
+    sortedHistory.forEach(entry => {
+      const completedInEntry = entry.exercises
+        .filter(ex => ex.status === 'completed' || (ex.sets && ex.sets.length > 0))
+        .sort((a, b) => (a.completionOrder || 0) - (b.completionOrder || 0));
+
+      completedInEntry.forEach(ex => {
+        const normalizedId = normalizeExerciseId(ex.id);
+        map[normalizedId] = sequenceNumber++;
+      });
+    });
+
+    return { map, nextSequenceNumber: sequenceNumber };
   };
 
-  const generateFullBodyWorkout = (history) => {
-    // 1. Check for prerequisites: at least one of each main category workout completed.
-    const completedCategories = new Set(history.map(entry => {
-      if (entry.workoutType.toLowerCase().includes('push')) return 'push';
-      if (entry.workoutType.toLowerCase().includes('pull')) return 'pull';
-      if (entry.workoutType.toLowerCase().includes('legs')) return 'legs';
-      return null;
-    }));
+  // Dynamic Scheduling Logic
+  const getNextWorkoutType = (history) => {
+    if (history.length === 0) return 'upper';
 
-    if (completedCategories.size < 3) {
-      console.log("Prerequisites not met for dynamic full body workout. Returning default list.");
-      return initialWorkoutsState['full body'];
+    const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const lastEntry = sortedHistory[0];
+
+    const lastWorkoutDate = new Date(lastEntry.date);
+    const now = new Date();
+    const diffTime = Math.abs(now - lastWorkoutDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 7) {
+      console.log(`Last workout was ${diffDays} days ago (> 7 days). Resetting recommended workout to Upper Body / Core.`);
+      return 'upper';
     }
 
-    // 2. Create a frequency map of all completed exercises from history
-    const frequencyMap = history
-      .flatMap(entry => entry.exercises)
-      .reduce((map, exercise) => {
-        map[exercise.id] = (map[exercise.id] || 0) + 1;
-        return map;
-      }, {});
+    let upperCount = 0;
+    let legsCount = 0;
+    lastEntry.exercises.forEach(ex => {
+      const normalizedId = normalizeExerciseId(ex.id);
+      const original = exercisesList.find(me => me.id === normalizedId);
+      if (original) {
+        if (original.bodyPart === 'upper') upperCount++;
+        if (original.bodyPart === 'legs') legsCount++;
+      }
+    });
 
-    const getLeastFrequent = (category, count) => {
-      const categoryExercises = rawWorkouts[category];
-      return [...categoryExercises]
-        .map(ex => ({ ...ex, count: frequencyMap[ex.id] || 0 }))
-        .sort((a, b) => a.count - b.count)
-        .slice(0, count);
-    };
+    if (upperCount > legsCount) {
+      return 'legs';
+    } else if (legsCount > upperCount) {
+      return 'upper';
+    }
 
-    // 3. Get the 2 least frequent from each main category
-    const leastFrequentPush = getLeastFrequent('push', 2);
-    const leastFrequentPull = getLeastFrequent('pull', 2);
-    const leastFrequentLegs = getLeastFrequent('legs', 2);
+    return 'upper';
+  };
 
-    let fullBodyWorkout = [
-      ...leastFrequentPush,
-      ...leastFrequentPull,
-      ...leastFrequentLegs,
-    ];
+  // Generate 7 exercises matching bodyPart sorted by oldest logged sequence, respecting max-2 primary muscle tag restriction
+  const generateWorkoutPlaylist = (workoutType) => {
+    const { map: sequenceMap } = getExerciseSequenceMap(workoutHistory);
+    const candidates = exercisesList.filter(ex => ex.bodyPart === workoutType && !ex.hibernated);
 
-    // 4. Find the 7th exercise
-    if (fullBodyWorkout.length < 7) {
-      const thirdLeastPush = getLeastFrequent('push', 3).pop();
-      const thirdLeastPull = getLeastFrequent('pull', 3).pop();
-      const thirdLeastLegs = getLeastFrequent('legs', 3).pop();
+    const candidatesWithSeq = candidates.map(ex => ({
+      ...ex,
+      seq: sequenceMap[ex.id] || 0
+    }));
+    candidatesWithSeq.sort((a, b) => a.seq - b.seq);
 
-      const candidates = [thirdLeastPush, thirdLeastPull, thirdLeastLegs]
-        .filter(Boolean) // Remove any undefined candidates
-        .sort((a, b) => (a.count || 0) - (b.count || 0));
-      
-      if (candidates.length > 0) {
-        fullBodyWorkout.push(candidates[0]);
+    const playlist = [];
+    const primaryMuscleCounts = {};
+
+    for (const exercise of candidatesWithSeq) {
+      if (playlist.length === 7) break;
+
+      const primaryTag = exercise.primary;
+      const currentCount = primaryMuscleCounts[primaryTag] || 0;
+
+      if (currentCount < 2) {
+        playlist.push(exercise);
+        primaryMuscleCounts[primaryTag] = currentCount + 1;
       }
     }
-    
-    // Fallback to default if something goes wrong
-    if (fullBodyWorkout.length < 7) {
-        return initialWorkoutsState['full body'];
+
+    // Fallback in case constraint limits playlist size to under 7
+    if (playlist.length < 7) {
+      for (const exercise of candidatesWithSeq) {
+        if (playlist.length === 7) break;
+        if (!playlist.some(p => p.id === exercise.id)) {
+          playlist.push(exercise);
+        }
+      }
     }
 
-    return fullBodyWorkout;
+    return playlist;
   };
 
+  // Start Session
   const handleStartWorkout = (workoutType) => {
-    let workoutExercises;
+    const workoutExercises = generateWorkoutPlaylist(workoutType);
 
-    if (workoutType === 'full body') {
-      workoutExercises = generateFullBodyWorkout(workoutHistory);
-    } else {
-      workoutExercises = reorderCategoryWorkout(workoutType, workoutHistory);
-    }
-
-    // Find the last performance for each exercise and pre-fill the data
+    // Pre-fill each exercise with the last completed reps & weight from history
     const exercisesWithPrefilledData = workoutExercises.map(exercise => {
       let lastPerformance = null;
-      // Search history backwards to find the most recent entry for this exercise
       for (let i = workoutHistory.length - 1; i >= 0; i--) {
         const entry = workoutHistory[i];
-        const foundExercise = entry.exercises.find(e => e.id === exercise.id);
+        const foundExercise = entry.exercises.find(e => normalizeExerciseId(e.id) === exercise.id);
         if (foundExercise && foundExercise.sets && foundExercise.sets.length > 0) {
           lastPerformance = foundExercise;
-          break; // Found the most recent one, no need to look further
+          break;
         }
       }
 
@@ -197,176 +271,211 @@ function App() {
         const lastSet = lastPerformance.sets[lastPerformance.sets.length - 1];
         const prefilledData = {
           ...exercise,
+          status: 'pending',
+          sets: [],
           lastReps: lastSet.reps,
           lastWeight: lastSet.weight,
         };
 
-        // Specifically for Leg Press, find the last set with plate details
-        if (exercise.name === 'Leg Press') {
+        if (exercise.weightType === 'plate') {
           const setWithPlateDetails = [...lastPerformance.sets].reverse().find(s => s.plateDetails);
           if (setWithPlateDetails) {
             prefilledData.lastPlateDetails = setWithPlateDetails.plateDetails;
           }
         }
-
         return prefilledData;
       }
 
-      return exercise; // Return original exercise if no history is found
+      return {
+        ...exercise,
+        status: 'pending',
+        sets: []
+      };
     });
 
-    // Update the state for the current workout with the new list
-    setWorkouts(prevWorkouts => ({
-      ...prevWorkouts,
-      [workoutType]: exercisesWithPrefilledData
-    }));
-
-    setActiveWorkout(workoutType);
+    setActivePlaylist(exercisesWithPrefilledData);
+    setActiveWorkoutType(workoutType);
     setCurrentView('workout');
   };
 
-  const handleCompleteWorkout = () => {
-    // 1. Get all exercises across ALL workouts that are completed and have sets.
-    const allCompletedExercises = Object.values(workouts)
-      .flat()
-      .filter(ex => ex.status === 'completed' && ex.sets.some(set => set.reps || set.weight));
+  // Gym Chaos A: Machine Unavailable (Skipping and replacing in active playlist)
+  const handleMachineUnavailable = (exerciseId) => {
+    const filteredPlaylist = activePlaylist.filter(ex => ex.id !== exerciseId);
 
-    // 2. If there are no completed exercises, just reset and exit.
-    if (allCompletedExercises.length === 0) {
-      setWorkouts(initialWorkoutsState);
-      setCurrentView('selection');
-      setActiveWorkout(null);
-      return;
+    const primaryMuscleCounts = {};
+    filteredPlaylist.forEach(ex => {
+      primaryMuscleCounts[ex.primary] = (primaryMuscleCounts[ex.primary] || 0) + 1;
+    });
+
+    const { map: sequenceMap } = getExerciseSequenceMap(workoutHistory);
+    const candidates = exercisesList.filter(
+      ex => ex.bodyPart === activeWorkoutType && !ex.hibernated && !filteredPlaylist.some(p => p.id === ex.id)
+    );
+
+    const candidatesWithSeq = candidates.map(ex => ({
+      ...ex,
+      seq: sequenceMap[ex.id] || 0
+    }));
+    candidatesWithSeq.sort((a, b) => a.seq - b.seq);
+
+    let replacement = null;
+    for (const candidate of candidatesWithSeq) {
+      const currentCount = primaryMuscleCounts[candidate.primary] || 0;
+      if (currentCount < 2) {
+        replacement = candidate;
+        break;
+      }
     }
 
-    // 3. Create a mutable copy of the counters and tag exercises with an order number.
-    let updatedCounters = { ...completionCounters };
-    const allCompletedExercisesWithOrder = allCompletedExercises.map(completedEx => {
-      let exerciseCategory = null;
-      for (const cat in rawWorkouts) {
-        if (rawWorkouts[cat].some(ex => ex.id === completedEx.id)) {
-          exerciseCategory = cat;
+    if (!replacement && candidatesWithSeq.length > 0) {
+      replacement = candidatesWithSeq[0];
+    }
+
+    if (replacement) {
+      let lastPerformance = null;
+      for (let i = workoutHistory.length - 1; i >= 0; i--) {
+        const entry = workoutHistory[i];
+        const foundExercise = entry.exercises.find(e => normalizeExerciseId(e.id) === replacement.id);
+        if (foundExercise && foundExercise.sets && foundExercise.sets.length > 0) {
+          lastPerformance = foundExercise;
           break;
         }
       }
 
-      if (exerciseCategory && updatedCounters.hasOwnProperty(exerciseCategory)) {
-        updatedCounters[exerciseCategory]++;
-        return { ...completedEx, completionOrder: updatedCounters[exerciseCategory] };
-      }
-      return completedEx; // Return as-is if no category is matched
-    });
+      const prefilledReplacement = {
+        ...replacement,
+        status: 'pending',
+        sets: [],
+        ...(lastPerformance ? {
+          lastReps: lastPerformance.sets[lastPerformance.sets.length - 1].reps,
+          lastWeight: lastPerformance.sets[lastPerformance.sets.length - 1].weight,
+        } : {})
+      };
 
-    // Find incomplete exercises from the active workout to prioritize them next time
-    const incompleteExercises = workouts[activeWorkout]
-      .filter(ex => ex.status !== 'completed');
-
-    // Find the highest completion order number from the exercises that were actually completed
-    const maxOrder = allCompletedExercisesWithOrder.reduce((max, ex) => Math.max(max, ex.completionOrder || 0), 0);
-
-    // Tag incomplete exercises with a higher order number so they appear first next time
-    const incompleteExercisesWithOrder = incompleteExercises.map((ex, index) => ({
-      ...ex,
-      completionOrder: maxOrder + index + 1, // Assign ascending numbers starting after the max
-      status: 'pending', // Reset status for next time
-      sets: [], // Clear sets for next time
-    }));
-
-    // Combine the completed and prioritized incomplete exercises for the history entry
-    const allExercisesForHistory = [...allCompletedExercisesWithOrder, ...incompleteExercisesWithOrder];
-
-    // 4. Count completed exercises in each category (excluding 'full body').
-    const counts = { push: 0, pull: 0, legs: 0 };
-    allCompletedExercisesWithOrder.forEach(completedEx => {
-      for (const workoutType in rawWorkouts) {
-        if (counts.hasOwnProperty(workoutType)) { // Only count push, pull, legs
-          if (rawWorkouts[workoutType].some(rawEx => rawEx.id === completedEx.id)) {
-            counts[workoutType]++;
-            break; // Move to the next completed exercise
-          }
+      if (replacement.weightType === 'plate' && lastPerformance) {
+        const setWithPlateDetails = [...lastPerformance.sets].reverse().find(s => s.plateDetails);
+        if (setWithPlateDetails) {
+          prefilledReplacement.lastPlateDetails = setWithPlateDetails.plateDetails;
         }
       }
-    });
 
-    // 4. Determine the title based on the counts.
-    let finalWorkoutTitle = '';
-    const activeCategories = Object.entries(counts)
-      .filter(([, count]) => count > 0)
-      .sort((a, b) => b[1] - a[1]); // Sort descending by count
-
-    if (activeCategories.length === 3) {
-      finalWorkoutTitle = 'Full Body Mix';
-    } else if (activeCategories.length > 0) {
-      const primary = activeCategories[0][0];
-      const secondaries = activeCategories.slice(1).map(cat => cat[0]);
-      
-      const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-      finalWorkoutTitle = capitalize(primary);
-      if (secondaries.length > 0) {
-        finalWorkoutTitle += ` w/ ${secondaries.map(capitalize).join(' & ')}`;
-      }
+      setActivePlaylist([...filteredPlaylist, prefilledReplacement]);
     } else {
-      // Fallback in case no categorized exercises were done (should be rare)
-      finalWorkoutTitle = activeWorkout.charAt(0).toUpperCase() + activeWorkout.slice(1);
+      setActivePlaylist(filteredPlaylist);
+    }
+  };
+
+  // Gym Chaos B: Add Exercise (Appending extra lift to end of playlist)
+  const handleAddNewExercise = (exerciseId) => {
+    if (activePlaylist.some(ex => ex.id === exerciseId)) {
+      alert("This exercise is already in your active workout!");
+      return;
     }
 
-    // 5. Create the history log.
+    const original = exercisesList.find(ex => ex.id === exerciseId);
+    if (!original) return;
+
+    let lastPerformance = null;
+    for (let i = workoutHistory.length - 1; i >= 0; i--) {
+      const entry = workoutHistory[i];
+      const foundExercise = entry.exercises.find(e => normalizeExerciseId(e.id) === exerciseId);
+      if (foundExercise && foundExercise.sets && foundExercise.sets.length > 0) {
+        lastPerformance = foundExercise;
+        break;
+      }
+    }
+
+    const prefilledExercise = {
+      ...original,
+      status: 'pending',
+      sets: [],
+      ...(lastPerformance ? {
+        lastReps: lastPerformance.sets[lastPerformance.sets.length - 1].reps,
+        lastWeight: lastPerformance.sets[lastPerformance.sets.length - 1].weight,
+      } : {})
+    };
+
+    if (original.weightType === 'plate' && lastPerformance) {
+      const setWithPlateDetails = [...lastPerformance.sets].reverse().find(s => s.plateDetails);
+      if (setWithPlateDetails) {
+        prefilledExercise.lastPlateDetails = setWithPlateDetails.plateDetails;
+      }
+    }
+
+    setActivePlaylist(prev => [...prev, prefilledExercise]);
+  };
+
+  // Complete Workout Session and Save Log
+  const handleCompleteWorkout = () => {
+    const completedExercises = activePlaylist.filter(
+      ex => ex.status === 'completed' && ex.sets.some(set => set.reps || set.weight)
+    );
+
+    if (completedExercises.length === 0) {
+      setActivePlaylist([]);
+      setActiveWorkoutType(null);
+      setCurrentView('selection');
+      return;
+    }
+
+    const { nextSequenceNumber } = getExerciseSequenceMap(workoutHistory);
+    let seq = nextSequenceNumber;
+
+    const completedWithOrder = completedExercises.map(ex => ({
+      ...ex,
+      completionOrder: seq++
+    }));
+
+    let title = activeWorkoutType === 'upper' ? 'Upper Body / Core' : 'Legs';
+    const hasLegsExtra = activeWorkoutType === 'upper' && completedWithOrder.some(ex => ex.bodyPart === 'legs');
+    const hasUpperExtra = activeWorkoutType === 'legs' && completedWithOrder.some(ex => ex.bodyPart === 'upper');
+    
+    if (hasLegsExtra) title += ' w/ Legs Extra';
+    if (hasUpperExtra) title += ' w/ Upper Extra';
+
     const newHistoryEntry = {
       id: Date.now(),
       date: new Date(),
-      workoutType: finalWorkoutTitle,
-      exercises: allExercisesForHistory, // Use the combined list for the history entry
+      workoutType: title,
+      exercises: completedWithOrder,
     };
-    setWorkoutHistory(prevHistory => [...prevHistory, newHistoryEntry]);
-    setCompletionCounters(updatedCounters); // Save the new counter values
 
-    // 6. Reset the app state.
-    setWorkouts(initialWorkoutsState);
+    setWorkoutHistory(prev => [...prev, newHistoryEntry]);
+
+    setActivePlaylist([]);
+    setActiveWorkoutType(null);
     setCurrentView('selection');
-    setActiveWorkout(null);
   };
 
+  // Handle Updates in active playlist
   const handleSetUpdate = (exerciseId, newSets) => {
-    const exerciseToUpdate = workouts[activeWorkout].find(ex => ex.id === exerciseId);
+    const exerciseToUpdate = activePlaylist.find(ex => ex.id === exerciseId);
     if (!exerciseToUpdate) return;
 
     const newStatus = exerciseToUpdate.status === 'pending' ? 'inProgress' : exerciseToUpdate.status;
     const updatedExercise = { ...exerciseToUpdate, sets: newSets, status: newStatus };
 
-    setWorkouts(prevWorkouts => {
-      const newWorkouts = { ...prevWorkouts };
-      newWorkouts[activeWorkout] = newWorkouts[activeWorkout].map(ex =>
-        ex.id === exerciseId ? updatedExercise : ex
-      );
-      return newWorkouts;
-    });
-
+    setActivePlaylist(prev => prev.map(ex => ex.id === exerciseId ? updatedExercise : ex));
     setSelectedExercise(updatedExercise);
   };
 
   const handleToggleComplete = (exerciseId, finalSets) => {
     let updatedExercise = null;
-    setWorkouts(prevWorkouts => {
-      const newWorkouts = { ...prevWorkouts };
-      const newExercises = newWorkouts[activeWorkout].map(ex => {
-        if (ex.id === exerciseId) {
-          // Toggle between completed and inProgress
-          const newStatus = ex.status === 'completed' ? 'inProgress' : 'completed';
-          updatedExercise = { ...ex, status: newStatus, sets: finalSets };
-          return updatedExercise;
-        }
-        return ex;
-      });
-      newWorkouts[activeWorkout] = newExercises;
-      return newWorkouts;
-    });
+    setActivePlaylist(prev => prev.map(ex => {
+      if (ex.id === exerciseId) {
+        const newStatus = ex.status === 'completed' ? 'inProgress' : 'completed';
+        updatedExercise = { ...ex, status: newStatus, sets: finalSets };
+        return updatedExercise;
+      }
+      return ex;
+    }));
 
     if (updatedExercise) {
       setSelectedExercise(updatedExercise);
     }
   };
 
+  // History Import / Export Settings
   const handleImportHistory = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -375,24 +484,14 @@ function App() {
     reader.onload = (e) => {
       try {
         const importedHistory = JSON.parse(e.target.result);
-        // Basic validation
         if (!Array.isArray(importedHistory)) {
           throw new Error('Invalid history file format.');
         }
 
         if (window.confirm('Are you sure you want to replace your current history with the imported data?')) {
-          setWorkoutHistory(importedHistory.map(entry => ({ ...entry, date: new Date(entry.date) })));
-          // Recalculate completion counters from the imported history
-          const newCounters = importedHistory.reduce((acc, entry) => {
-            entry.exercises.forEach(ex => {
-              if (ex.completionOrder && ex.completionOrder > (acc[ex.category] || 0)) {
-                acc[ex.category] = ex.completionOrder;
-              }
-            });
-            return acc;
-          }, { push: 0, pull: 0, legs: 0 });
-          setCompletionCounters(newCounters);
-
+          const parsed = importedHistory.map(entry => ({ ...entry, date: new Date(entry.date) }));
+          setWorkoutHistory(migrateWorkoutHistory(parsed));
+          setCompletionCounters({ push: 0, pull: 0, legs: 0 }); // reset legacy counters
           alert('History imported successfully.');
           setCurrentView('selection');
         }
@@ -403,6 +502,29 @@ function App() {
     reader.readAsText(file);
   };
 
+  const handleExportHistory = () => {
+    const historyJson = JSON.stringify(workoutHistory, null, 2);
+    const blob = new Blob([historyJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `workout-history-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleResetHistory = () => {
+    if (window.confirm('Are you sure you want to reset all workout history? This action cannot be undone.')) {
+      setWorkoutHistory([]);
+      setCompletionCounters({ push: 0, pull: 0, legs: 0 });
+      alert('Workout history has been reset.');
+      setCurrentView('selection');
+    }
+  };
+
+  // Dialog helpers
   const openNumberModal = (initialValue, onConfirm) => {
     setNumberModalConfig({ initialValue, onConfirm });
     setIsNumberModalOpen(true);
@@ -431,28 +553,12 @@ function App() {
     closePlateCalculatorModal();
   };
 
-  const handleExportHistory = () => {
-    const historyJson = JSON.stringify(workoutHistory, null, 2);
-    const blob = new Blob([historyJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `workout-history-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleViewHistoryDetail = (entry) => {
+    setSelectedHistoryEntry(entry);
+    setCurrentView('historyDetail');
   };
 
-  const handleResetHistory = () => {
-    if (window.confirm('Are you sure you want to reset all workout history? This action cannot be undone.')) {
-      setWorkoutHistory([]);
-      setCompletionCounters({ push: 0, pull: 0, legs: 0 });
-      // The useEffect hook will handle updating localStorage
-      alert('Workout history has been reset.');
-      setCurrentView('selection'); // Go back to the main screen
-    }
-  };
+  const [selectedHistoryEntry, setSelectedHistoryEntry] = useState(null);
 
   const renderContent = () => {
     switch (currentView) {
@@ -465,6 +571,14 @@ function App() {
           isDebugMode={isDebugMode}
           onToggleDebugMode={() => setIsDebugMode(!isDebugMode)}
         />;
+      case 'manageExercises':
+        return <ManageExercises
+          onNavigate={setCurrentView}
+          exercisesList={exercisesList}
+          onCreateExercise={handleCreateExercise}
+          onDeleteExercise={handleDeleteExercise}
+          onUpdateExercise={handleUpdateExercise}
+        />;
       case 'historyDetail':
         return <HistoryDetail entry={selectedHistoryEntry} onNavigate={setCurrentView} />;
       case 'history':
@@ -473,17 +587,13 @@ function App() {
         return (
           <>
             <Navigation 
-              workouts={workouts}
-              activeWorkout={activeWorkout}
-            beepRef={beepRef}
-              onWorkoutChange={setActiveWorkout}
+              activeWorkoutType={activeWorkoutType}
               onCompleteWorkout={handleCompleteWorkout}
-              isDebugMode={isDebugMode}
             />
             <WorkoutTabs 
-              exercises={workouts[activeWorkout] || []} 
+              exercises={activePlaylist} 
               onExerciseClick={setSelectedExercise}
-              onCompleteWorkout={handleCompleteWorkout}
+              onAddExerciseClick={() => setIsAddExerciseOpen(true)}
             />
           </>
         );
@@ -491,21 +601,25 @@ function App() {
       default:
         return (
           <WorkoutSelection 
-            workouts={rawWorkouts} 
             onStartWorkout={handleStartWorkout} 
             onNavigate={setCurrentView}
-          activeWorkout={activeWorkout}
-          isDebugMode={isDebugMode}
+            activeWorkoutType={activeWorkoutType}
+            recommendedWorkout={getNextWorkoutType(workoutHistory)}
+            generateWorkoutPreview={generateWorkoutPlaylist}
           />
         );
     }
-  }
+  };
 
   return (
     <div className={styles.app}>
       <Header 
         onNavigateHome={() => setCurrentView('selection')} 
         onNavigateSettings={() => setCurrentView('settings')}
+        countdown={countdown}
+        isTimerActive={isTimerActive}
+        initialDuration={initialDuration}
+        stopTimer={stopTimer}
       />
       <div className={styles.container}>
         {renderContent()}
@@ -526,13 +640,19 @@ function App() {
             openPlateCalculatorModal={openPlateCalculatorModal}
             beepRef={beepRef}
             isDebugMode={isDebugMode}
+            countdown={countdown}
+            isTimerActive={isTimerActive}
+            initialDuration={initialDuration}
+            startTimer={startTimer}
+            stopTimer={stopTimer}
+            onMachineUnavailable={handleMachineUnavailable}
           />
         </div>
       )}
 
       {isNumberModalOpen && (
         <NumberInputModal 
-          initialValue={numberModalConfig.value}
+          initialValue={numberModalConfig.initialValue}
           onConfirm={handleNumberConfirm}
           onClose={closeNumberModal}
         />
@@ -546,8 +666,19 @@ function App() {
           openNumberModal={openNumberModal}
         />
       )}
+
+      {isAddExerciseOpen && (
+        <AddExerciseModal
+          onClose={() => setIsAddExerciseOpen(false)}
+          onAddExercise={handleAddNewExercise}
+          activePlaylist={activePlaylist}
+          workoutHistory={workoutHistory}
+          getExerciseSequenceMap={getExerciseSequenceMap}
+          exercisesList={exercisesList}
+        />
+      )}
     </div>
   );
 }
 
-export default App
+export default App;

@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 
 let wakeLock = null;
 
 export const useWakeLock = () => {
-  const [isSupported, setIsSupported] = useState(false);
-
-  useEffect(() => {
-    setIsSupported('wakeLock' in navigator);
-  }, []);
+  const isSupported = typeof window !== 'undefined' && 'wakeLock' in navigator;
 
   const requestWakeLock = useCallback(async () => {
     if (!('wakeLock' in navigator)) {

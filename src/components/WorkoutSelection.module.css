@@ -1,208 +1,232 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Fill the parent container from App.jsx */
+  height: 100%;
   width: 100%;
-  text-align: center;
+  padding-bottom: 5rem; /* prevent overlap with floating history button */
 }
 
 .mainContent {
-  flex-grow: 1; /* Grow to fill available space */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center content vertically */
-  width: 100%;
-}
-
-.startButton {
-  /* Using the global button styles from global.css */
-  margin-top: 1.5rem; /* Space between list and button */
-}
-
-.historyButtonContainer {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 0;
-  right: 0;
-  display: flex;
   justify-content: center;
-}
-
-.historyButton {
-  height: 50px;
-  width: 80%;
-  max-width: 350px;
-  border-radius: 50px;
-  background-color: var(--surface-color);
-  color: var(--text-color-secondary);
-  border: 1px solid var(--secondary-color);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.historyButton:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-/* --- Animation Styles --- */
-
-.revealContainer {
-  height: 240px; /* Fixed height to prevent jump */
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative; /* Ensure z-index works */
-  z-index: 1;       /* Place preview container behind buttons */
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
-.previewWrapper {
+.headerSection {
+  margin-bottom: 1.5rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fadeIn 0.5s ease-in-out forwards;
-}
-
-.previewWrapper.animatingOut {
-  animation: fadeOut 0.3s ease-in-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+  gap: 0.5rem;
 }
 
 .title {
   font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-color);
+  letter-spacing: -0.5px;
+}
+
+.recommendationBadge {
+  background-color: var(--primary-color-translucent);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  margin-bottom: 2rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.workoutSelectionCard {
+  background-color: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 16px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.workoutToggleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--secondary-color);
+  padding-bottom: 1rem;
+}
+
+.workoutTypeTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-color);
 }
 
-.categoryButtons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-  position: relative; /* Ensure z-index works */
-  z-index: 10;      /* Bring buttons to the front */
-}
-
-.categoryButton {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+.toggleButton {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--secondary-color);
-  border-radius: 50px; /* Pill shape */
-  background-color: transparent;
-  color: var(--text-color-secondary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.categoryButton.selected {
+.toggleButton:hover {
   background-color: var(--primary-color);
   color: var(--background-color);
-  border-color: var(--primary-color);
-  transform: scale(1.05);
 }
 
-.categoryButton:not(.selected):hover {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.preview {
-  margin-bottom: 2.5rem;
-  width: 100%;
-  max-width: 400px;
+.previewSection {
+  text-align: left;
 }
 
 .previewTitle {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--text-color-secondary);
-  margin-top: 4rem; /* Adds space above the title */
-  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.previewContainer {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 0.5rem 0.8rem;
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .previewList {
   list-style: none;
   padding: 0;
   margin: 0;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.previewList li {
-  padding: 0.25rem 0;
-  color: var(--text-color-secondary);
+.previewItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.startButton, .historyButton, .continueButton {
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+.previewItem:last-child {
+  border-bottom: none;
+}
+
+.exerciseName {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.muscleBadge {
+  font-size: 0.75rem;
   font-weight: 600;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  max-width: 350px;
-  margin-bottom: 1rem;
+  background-color: var(--secondary-color);
+  color: var(--text-color-secondary);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 }
 
 .startButton {
   background-color: var(--primary-color);
   color: var(--background-color);
   border: 1px solid var(--primary-color);
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 100%;
 }
 
-.startButton:disabled {
-  background-color: var(--secondary-color);
-  border-color: var(--secondary-color);
-  cursor: not-allowed;
-  transform: none;
+.startButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(132, 189, 0, 0.35);
 }
 
-.historyButton, .continueButton {
+.activeWorkoutCard {
   background-color: var(--surface-color);
-  color: var(--text-color);
-  border: 1px solid var(--secondary-color);
-}
-
-.startButton:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 15px rgba(132, 189, 0, 0.3);
-}
-
-.historyButton:hover, .continueButton:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  transform: translateY(-3px);
-}
-
-.continueContainer {
+  border: 1px solid var(--primary-color);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
+  box-shadow: var(--box-shadow);
+}
+
+.activeLabel {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.continueButton {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: 1px solid var(--primary-color);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.continueButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(132, 189, 0, 0.3);
+}
+
+.historyButtonContainer {
+  margin-top: 1.5rem;
+  width: 100%;
+  display: flex;
   justify-content: center;
-  height: 100%;
+}
+
+.historyButton {
+  height: 50px;
+  width: 90%;
+  max-width: 350px;
+  border-radius: 50px;
+  background-color: var(--surface-color);
+  color: var(--text-color-secondary);
+  border: 1px solid var(--secondary-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.historyButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: rgba(132, 189, 0, 0.05);
 }
