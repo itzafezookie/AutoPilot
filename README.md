@@ -4,9 +4,12 @@ AutoPilot is a simple and straightforward Progressive Web App (PWA) designed to 
 
 ## Key Features
 
-*   **Four Pre-Set Workouts**: Choose from one of four curated workout plans tailored for efficiency and designed to be compatible with equipment at most Planet Fitness clubs.
-*   **Simple and Focused**: No complicated logging or setup. Just open the app, pick your workout, and go.
-*   **PWA Support**: Install AutoPilot on your device for an app-like experience and quick access at the gym.
+*   **Smart Recommendations & Dynamic Playlists**: Recommends either Upper Body / Core or Legs based on your recent workout history, generating a balanced 7-lift playlist so you never overtrain one muscle group.
+*   **Exercise Library Customization**: Edit the details of any exercise—both default and custom—including names, target categories, weight tracking mode, and primary muscle targets.
+*   **Exercise Hibernation**: Toggle any exercise to hibernate, hiding it from recommended workouts and search modals while preserving its history.
+*   **User Added Custom Exercises**: Stage and add new custom exercises tagged with a "User Added" badge.
+*   **Search, Filtering & Sorting**: Sort through your library alphabetically by Name, by Muscle Group, or Custom first, and query by search term or muscle filter.
+*   **Progressive Web App (PWA)**: Install AutoPilot on your device for an app-like experience and quick access on the gym floor.
 
 ## Getting Started
 
@@ -21,9 +24,9 @@ To get a local copy up and running, follow these simple steps.
 
 ### Installation
 
-1.  Clone the repo (replace `your-username` with your GitHub username)
+1.  Clone the repo
     ```sh
-    git clone https://github.com/your-username/AutoPilot.git
+    git clone https://github.com/bfezu/AutoPilot.git
     ```
 2.  Install NPM packages
     ```sh
@@ -36,7 +39,9 @@ To get a local copy up and running, follow these simple steps.
 
 ## Usage
 
-Using AutoPilot is as easy as it gets:
-1. Open the app.
-2. Select one of the four workouts.
-3. Follow the list of exercises and use the machines.
+Using AutoPilot is simple:
+1. Open the app on your device.
+2. View your recommended workout (Upper Body / Core or Legs) generated from your history.
+3. Start the workout, follow the 7-lift playlist, and log your sets.
+4. Tweak your exercise list in Settings whenever you want to edit details or hibernate lifts.
+
