@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --primary-color: #84bd00; /* A vibrant green for primary actions */
   --primary-color-translucent: rgba(132, 189, 0, 0.5); /* Translucent version for glows */

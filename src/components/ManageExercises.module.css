@@ -467,4 +467,79 @@
   display: block;
 }
 
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem 1rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .addButton {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .controlsRow {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .selectsRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .filterSelect,
+  .sortSelect {
+    width: 100%;
+    padding: 0.6rem;
+  }
+
+  .exerciseCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    padding: 0.85rem;
+  }
+  
+  .cardLeft {
+    gap: 0.2rem;
+  }
+
+  .nameRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .exerciseName {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  
+  .cardRight {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .editButton,
+  .hibernateButton,
+  .unhibernateButton {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .deleteButton {
+    margin-left: 0.25rem;
+  }
+}
+
+
 
