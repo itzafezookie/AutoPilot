@@ -15,24 +15,10 @@ function Settings({ onNavigate, onExport, onImport, onReset, onExportExercises, 
       <div className={styles.mainContent}>
         <h2 className={styles.title}>Settings</h2>
         <div className={styles.buttonGroup}>
-          <button onClick={() => onNavigate('manageExercises')} className={styles.settingsButton}>
+          <button onClick={() => onNavigate('manageExercises')} className={`${styles.settingsButton} ${styles.successButton}`}>
             Manage Exercises
           </button>
           
-          <button onClick={handleImportClick} className={styles.settingsButton}>
-            Import History
-          </button>
-          <input 
-            type="file" 
-            id="import-file-input"
-            style={{ display: 'none' }} 
-            onChange={onImport}
-            accept=".json"
-          />
-          <button onClick={onExport} className={styles.settingsButton}>
-            Export History
-          </button>
-
           <button onClick={handleImportExercisesClick} className={styles.settingsButton}>
             Import Exercises
           </button>
@@ -45,6 +31,22 @@ function Settings({ onNavigate, onExport, onImport, onReset, onExportExercises, 
           />
           <button onClick={onExportExercises} className={styles.settingsButton}>
             Export Exercises
+          </button>
+
+          <div className={styles.separator}></div>
+
+          <button onClick={handleImportClick} className={styles.settingsButton}>
+            Import History
+          </button>
+          <input 
+            type="file" 
+            id="import-file-input"
+            style={{ display: 'none' }} 
+            onChange={onImport}
+            accept=".json"
+          />
+          <button onClick={onExport} className={styles.settingsButton}>
+            Export History
           </button>
 
           <button onClick={onReset} className={`${styles.settingsButton} ${styles.dangerButton}`}>
