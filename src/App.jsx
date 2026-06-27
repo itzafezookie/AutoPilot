@@ -515,6 +515,43 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportExercises = () => {
+    const exercisesJson = JSON.stringify(exercisesList, null, 2);
+    const blob = new Blob([exercisesJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `autopilot-exercises-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportExercises = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedExercises = JSON.parse(e.target.result);
+        if (!Array.isArray(importedExercises)) {
+          throw new Error('Invalid exercises file format.');
+        }
+
+        if (window.confirm('Are you sure you want to replace your current exercises list with the imported data? This will overwrite your custom exercise edits.')) {
+          const migrated = migrateExercisesList(importedExercises);
+          setExercisesList(migrated);
+          alert('Exercises imported successfully.');
+        }
+      } catch (error) {
+        alert(`Failed to import exercises: ${error.message}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleResetHistory = () => {
     if (window.confirm('Are you sure you want to reset all workout history? This action cannot be undone.')) {
       setWorkoutHistory([]);
@@ -568,6 +605,8 @@ function App() {
           onExport={handleExportHistory} 
           onReset={handleResetHistory} 
           onImport={handleImportHistory}
+          onExportExercises={handleExportExercises}
+          onImportExercises={handleImportExercises}
           isDebugMode={isDebugMode}
           onToggleDebugMode={() => setIsDebugMode(!isDebugMode)}
         />;

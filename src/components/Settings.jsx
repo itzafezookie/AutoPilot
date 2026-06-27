@@ -1,9 +1,13 @@
 import styles from './Settings.module.css';
 import fezukLogo from '../assets/Fezuk Tech Logo.svg';
 
-function Settings({ onNavigate, onExport, onImport, onReset, isDebugMode, onToggleDebugMode }) {
+function Settings({ onNavigate, onExport, onImport, onReset, onExportExercises, onImportExercises, isDebugMode, onToggleDebugMode }) {
   const handleImportClick = () => {
     document.getElementById('import-file-input').click();
+  };
+
+  const handleImportExercisesClick = () => {
+    document.getElementById('import-exercises-file-input').click();
   };
 
   return (
@@ -28,6 +32,21 @@ function Settings({ onNavigate, onExport, onImport, onReset, isDebugMode, onTogg
           <button onClick={onExport} className={styles.settingsButton}>
             Export History
           </button>
+
+          <button onClick={handleImportExercisesClick} className={styles.settingsButton}>
+            Import Exercises
+          </button>
+          <input 
+            type="file" 
+            id="import-exercises-file-input"
+            style={{ display: 'none' }} 
+            onChange={onImportExercises}
+            accept=".json"
+          />
+          <button onClick={onExportExercises} className={styles.settingsButton}>
+            Export Exercises
+          </button>
+
           <button onClick={onReset} className={`${styles.settingsButton} ${styles.dangerButton}`}>
             Reset History
           </button>
