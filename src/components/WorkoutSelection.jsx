@@ -1,7 +1,14 @@
+import { useState, useEffect } from 'react';
 import styles from './WorkoutSelection.module.css';
 
 function WorkoutSelection({ onStartWorkout, onNavigate, activeWorkoutType, recommendedWorkout, generateWorkoutPreview }) {
-  const previewExercises = generateWorkoutPreview ? generateWorkoutPreview(recommendedWorkout) : [];
+  const [selectedType, setSelectedType] = useState(recommendedWorkout);
+
+  useEffect(() => {
+    setSelectedType(recommendedWorkout);
+  }, [recommendedWorkout]);
+
+  const previewExercises = generateWorkoutPreview ? generateWorkoutPreview(selectedType) : [];
 
   return (
     <div className={styles.container}>
@@ -35,10 +42,26 @@ function WorkoutSelection({ onStartWorkout, onNavigate, activeWorkoutType, recom
             </div>
 
             <div className={styles.workoutSelectionCard}>
-              <div className={styles.workoutToggleHeader}>
-                <span className={styles.workoutTypeTitle}>
-                  {recommendedWorkout === 'upper' ? 'Upper Body / Core Workout' : 'Legs Workout'}
-                </span>
+              <div className={styles.toggleContainer}>
+                <div className={styles.toggleTrack}>
+                  <div 
+                    className={`${styles.toggleThumb} ${selectedType === 'legs' ? styles.toggleThumbRight : ''}`} 
+                  />
+                  <button 
+                    type="button"
+                    className={`${styles.toggleOption} ${selectedType === 'upper' ? styles.activeOption : ''}`}
+                    onClick={() => setSelectedType('upper')}
+                  >
+                    Upper Body
+                  </button>
+                  <button 
+                    type="button"
+                    className={`${styles.toggleOption} ${selectedType === 'legs' ? styles.activeOption : ''}`}
+                    onClick={() => setSelectedType('legs')}
+                  >
+                    Legs
+                  </button>
+                </div>
               </div>
 
               <div className={styles.previewSection}>
@@ -57,7 +80,7 @@ function WorkoutSelection({ onStartWorkout, onNavigate, activeWorkoutType, recom
 
               <button
                 className={styles.startButton}
-                onClick={() => onStartWorkout(recommendedWorkout)}
+                onClick={() => onStartWorkout(selectedType)}
               >
                 Start Workout
               </button>

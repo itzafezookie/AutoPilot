@@ -31,16 +31,29 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
   const [weightType, setWeightType] = useState('typed'); // 'typed' or 'plate'
   const [bodyPart, setBodyPart] = useState('upper'); // 'upper' or 'legs'
   const [primary, setPrimary] = useState('Chest');
+  const [customMuscle, setCustomMuscle] = useState('');
+  const [isCustomMuscleSelected, setIsCustomMuscleSelected] = useState(false);
 
   // Filtering & Sorting state
   const [searchQuery, setSearchQuery] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('name'); // 'name', 'muscle', 'custom'
+  const [sortBy, setSortBy] = useState('name'); // 'name', 'muscle'
+
+  // Get unique muscles for a body part (defaults + any currently used in exercisesList)
+  const getMusclesByBodyPart = (part) => {
+    const defaults = MUSCLES_BY_BODYPART[part] || [];
+    const inUse = exercisesList
+      .filter(ex => ex.bodyPart === part)
+      .map(ex => ex.primary);
+    return Array.from(new Set([...defaults, ...inUse])).sort();
+  };
 
   const handleBodyPartChange = (part) => {
     setBodyPart(part);
-    // Set a default primary muscle matching the selected body part
-    setPrimary(part === 'upper' ? 'Chest' : 'Quads');
+    const available = getMusclesByBodyPart(part);
+    setPrimary(available[0] || (part === 'upper' ? 'Chest' : 'Quads'));
+    setIsCustomMuscleSelected(false);
+    setCustomMuscle('');
   };
 
   const handleEditClick = (exercise) => {
@@ -49,6 +62,8 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
     setWeightType(exercise.weightType);
     setBodyPart(exercise.bodyPart);
     setPrimary(exercise.primary);
+    setIsCustomMuscleSelected(false);
+    setCustomMuscle('');
   };
 
   const handleToggleHibernate = (exercise) => {
@@ -62,19 +77,25 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
     e.preventDefault();
     if (!name.trim()) return;
 
+    let finalPrimary = primary;
+    if (isCustomMuscleSelected) {
+      if (!customMuscle.trim()) return;
+      finalPrimary = customMuscle.trim();
+    }
+
     if (editingExercise) {
       onUpdateExercise({
         ...editingExercise,
         name: name.trim(),
         bodyPart,
-        primary,
+        primary: finalPrimary,
         weightType
       });
     } else {
       onCreateExercise({
         name: name.trim(),
         bodyPart,
-        primary,
+        primary: finalPrimary,
         weightType
       });
     }
@@ -84,6 +105,8 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
     setWeightType('typed');
     setBodyPart('upper');
     setPrimary('Chest');
+    setIsCustomMuscleSelected(false);
+    setCustomMuscle('');
     setIsAdding(false);
     setEditingExercise(null);
   };
@@ -93,15 +116,17 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
     setWeightType('typed');
     setBodyPart('upper');
     setPrimary('Chest');
+    setIsCustomMuscleSelected(false);
+    setCustomMuscle('');
     setIsAdding(false);
     setEditingExercise(null);
   };
 
-  // Compile list of all muscles for filter dropdown
-  const ALL_MUSCLES = [
-    ...MUSCLES_BY_BODYPART.upper,
-    ...MUSCLES_BY_BODYPART.legs
-  ];
+  // Compile list of all muscles for filter dropdown dynamically
+  const ALL_MUSCLES = Array.from(new Set([
+    ...getMusclesByBodyPart('upper'),
+    ...getMusclesByBodyPart('legs')
+  ])).sort();
 
   const processExercises = (exercises, targetBodyPart) => {
     let filtered = exercises.filter(ex => ex.bodyPart === targetBodyPart);
@@ -148,9 +173,6 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
       <div className={styles.cardLeft}>
         <div className={styles.nameRow}>
           <span className={styles.exerciseName}>{exercise.name}</span>
-          {exercise.custom && (
-            <span className={styles.customBadge}>User Added</span>
-          )}
         </div>
         <span className={styles.muscleLabel}>{exercise.primary}</span>
       </div>
@@ -172,15 +194,13 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
         >
           {exercise.hibernated ? "Unhibernate" : "Hibernate"}
         </button>
-        {exercise.custom && (
-          <button 
-            onClick={() => onDeleteExercise(exercise.id)} 
-            className={styles.deleteButton}
-            title="Delete Custom Exercise"
-          >
-            &times;
-          </button>
-        )}
+        <button 
+          onClick={() => onDeleteExercise(exercise.id)} 
+          className={styles.deleteButton}
+          title="Delete Exercise"
+        >
+          &times;
+        </button>
       </div>
     </div>
   );
@@ -252,14 +272,39 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
               <select 
                 id="ex-muscle"
                 className={styles.select}
-                value={primary}
-                onChange={(e) => setPrimary(e.target.value)}
+                value={isCustomMuscleSelected ? 'custom' : primary}
+                onChange={(e) => {
+                  if (e.target.value === 'custom') {
+                    setIsCustomMuscleSelected(true);
+                  } else {
+                    setIsCustomMuscleSelected(false);
+                    setPrimary(e.target.value);
+                  }
+                }}
               >
-                {MUSCLES_BY_BODYPART[bodyPart].map(muscle => (
+                {getMusclesByBodyPart(bodyPart).map(muscle => (
                   <option key={muscle} value={muscle}>{muscle}</option>
                 ))}
+                <option value="custom">+ Add Custom Muscle...</option>
               </select>
             </div>
+
+            {isCustomMuscleSelected && (
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="ex-custom-muscle">Custom Muscle Name</label>
+                <input 
+                  type="text" 
+                  id="ex-custom-muscle"
+                  className={styles.input} 
+                  placeholder="e.g. Forearms, Neck, Upper Chest" 
+                  value={customMuscle}
+                  onChange={(e) => setCustomMuscle(e.target.value)}
+                  maxLength={30}
+                  required
+                  autoFocus
+                />
+              </div>
+            )}
 
             <div className={styles.buttonGroup}>
               <button type="button" onClick={handleCancel} className={styles.cancelButton}>
@@ -313,7 +358,6 @@ function ManageExercises({ onNavigate, exercisesList, onCreateExercise, onDelete
               >
                 <option value="name">Sort by Name</option>
                 <option value="muscle">Sort by Muscle</option>
-                <option value="custom">Sort by Custom</option>
               </select>
             </div>
           </div>

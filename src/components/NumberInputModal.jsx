@@ -5,7 +5,8 @@ function NumberInputModal({ initialValue, onConfirm, onClose }) {
   const [value, setValue] = useState(String(initialValue || ''));
 
   const handleKeyPress = (key) => {
-    if (value.length >= 5) return; // Limit input length
+    if (value.length >= 6) return; // Limit input length (allow decimal)
+    if (key === '.' && value.includes('.')) return;
     setValue(value + key);
   };
 
@@ -20,7 +21,18 @@ function NumberInputModal({ initialValue, onConfirm, onClose }) {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <div className={styles.display}>{value || '0'}</div>
+        <div className={styles.displayContainer}>
+          <div className={styles.display}>{value || '0'}</div>
+          {value && (
+            <button 
+              type="button" 
+              className={styles.clearButton} 
+              onClick={() => setValue('')}
+            >
+              Clear
+            </button>
+          )}
+        </div>
         <div className={styles.keypad}>
           <button className={styles.key} onClick={() => handleKeyPress('1')}>1</button>
           <button className={styles.key} onClick={() => handleKeyPress('2')}>2</button>
@@ -31,7 +43,7 @@ function NumberInputModal({ initialValue, onConfirm, onClose }) {
           <button className={styles.key} onClick={() => handleKeyPress('7')}>7</button>
           <button className={styles.key} onClick={() => handleKeyPress('8')}>8</button>
           <button className={styles.key} onClick={() => handleKeyPress('9')}>9</button>
-          <button className={`${styles.key} ${styles.clear}`} onClick={() => setValue('')}>C</button>
+          <button className={styles.key} onClick={() => handleKeyPress('.')}>.</button>
           <button className={styles.key} onClick={() => handleKeyPress('0')}>0</button>
           <button className={`${styles.key} ${styles.backspace}`} onClick={handleBackspace}>&larr;</button>
         </div>

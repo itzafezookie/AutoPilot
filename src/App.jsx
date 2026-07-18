@@ -192,24 +192,40 @@ function App() {
       return 'upper';
     }
 
-    let upperCount = 0;
-    let legsCount = 0;
-    lastEntry.exercises.forEach(ex => {
-      const normalizedId = normalizeExerciseId(ex.id);
-      const original = exercisesList.find(me => me.id === normalizedId);
-      if (original) {
-        if (original.bodyPart === 'upper') upperCount++;
-        if (original.bodyPart === 'legs') legsCount++;
+    // Direct alternate lookup based on targetWorkoutType or legacy workoutType title
+    let lastType = null;
+    if (lastEntry.targetWorkoutType) {
+      lastType = lastEntry.targetWorkoutType;
+    } else if (typeof lastEntry.workoutType === 'string') {
+      const typeStr = lastEntry.workoutType.toLowerCase();
+      if (typeStr.includes('upper')) {
+        lastType = 'upper';
+      } else if (typeStr.includes('legs')) {
+        lastType = 'legs';
       }
-    });
-
-    if (upperCount > legsCount) {
-      return 'legs';
-    } else if (legsCount > upperCount) {
-      return 'upper';
     }
 
-    return 'upper';
+    // Fallback if undetermined
+    if (!lastType) {
+      let upperCount = 0;
+      let legsCount = 0;
+      lastEntry.exercises.forEach(ex => {
+        const normalizedId = normalizeExerciseId(ex.id);
+        const original = exercisesList.find(me => me.id === normalizedId);
+        if (original) {
+          if (original.bodyPart === 'upper') upperCount++;
+          if (original.bodyPart === 'legs') legsCount++;
+        }
+      });
+
+      if (upperCount > legsCount) {
+        lastType = 'upper';
+      } else if (legsCount > upperCount) {
+        lastType = 'legs';
+      }
+    }
+
+    return lastType === 'upper' ? 'legs' : 'upper';
   };
 
   // Generate 7 exercises matching bodyPart sorted by oldest logged sequence, respecting max-2 primary muscle tag restriction
@@ -437,6 +453,7 @@ function App() {
       id: Date.now(),
       date: new Date(),
       workoutType: title,
+      targetWorkoutType: activeWorkoutType,
       exercises: completedWithOrder,
     };
 

@@ -13,8 +13,14 @@ function History({ history, onNavigate, onViewDetail }) {
         <div className={styles.historyList}>
           {history.map(entry => (
             <button key={entry.id} onClick={() => onViewDetail(entry)} className={styles.historyEntry}>
-              <span className={styles.date}>{new Date(entry.date).toLocaleDateString()}</span>
-              <span className={styles.workoutType}>{entry.workoutType}</span>
+              <span className={styles.date}>
+                {new Date(entry.date).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </span>
             </button>
           ))}
         </div>
