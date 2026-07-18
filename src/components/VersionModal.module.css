@@ -17,7 +17,7 @@
   border-radius: var(--border-radius);
   text-align: center;
   width: 90%;
-  max-width: 400px;
+  max-width: 450px;
   border: 1px solid var(--secondary-color);
 }
 
@@ -31,6 +31,73 @@
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 1.5rem;
+}
+
+.changelogSection {
+  text-align: left;
+  margin-bottom: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.changelogTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  color: var(--text-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.4rem;
+}
+
+.changelogList {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.release {
+  margin-bottom: 1.2rem;
+}
+
+.release:last-child {
+  margin-bottom: 0;
+}
+
+.releaseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.releaseVersion {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary-color);
+}
+
+.releaseDate {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.releaseChanges {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  line-height: 1.4;
+}
+
+.changeItem {
+  margin-bottom: 0.3rem;
+}
+
+.changeItem:last-child {
+  margin-bottom: 0;
 }
 
 .copyright {
